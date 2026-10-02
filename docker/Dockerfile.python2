@@ -1,0 +1,7 @@
+FROM python:2.7-slim
+
+WORKDIR /app
+
+COPY legacy.py /app/legacy.py
+
+CMD ["python", "/app/legacy.py"]
