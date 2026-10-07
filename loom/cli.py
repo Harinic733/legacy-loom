@@ -1,4 +1,5 @@
 import typer
+from pathlib import Path
 from rich.console import Console
 
 from loom.agents.reader import ReaderAgent
@@ -54,8 +55,10 @@ def analyze(file_path: str):
 
 
 @app.command()
-def migrate(file_path: str):
-    """Translate and verify a Python 2 file."""
+def migrate(
+    file_path: str,
+    output: str = "migrated.py",
+):
 
     reader = ReaderAgent()
     translator = TranslatorAgent()
@@ -83,7 +86,7 @@ def migrate(file_path: str):
             target="python3",
         )
 
-        output_path = "migrated.py"
+        output_path = output
 
         translator.save_translation(
             translated,
@@ -142,7 +145,10 @@ def migrate(file_path: str):
         # 6. Display migration report
         console.print(report.display())
 
-        report_path = "reports/migration_report.json"
+        
+
+        report_name = Path(output_path).stem
+        report_path = f"reports/migration_report_{report_name}.json"
         report.save_json(report_path)
 
         console.print(

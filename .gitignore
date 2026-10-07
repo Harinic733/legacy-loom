@@ -5,3 +5,6 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+# Legacy Loom generated files
+migrated*.py
+reports/
