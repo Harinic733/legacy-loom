@@ -33,6 +33,7 @@ class DockerRunner:
             "docker",
             "run",
             "--rm",
+             "-i",
             "--network",
             "none",
             "-v",

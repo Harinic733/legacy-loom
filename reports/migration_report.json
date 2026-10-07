@@ -1,0 +1,9 @@
+{
+    "source_file": "examples/python2/legacy.py",
+    "target_file": "migrated.py",
+    "language": "python",
+    "translated": true,
+    "verified": true,
+    "original_output": "Enter numbers: 60\nHello, Legacy Loom\n",
+    "translated_output": "Enter numbers: 60\nHello, Legacy Loom\n"
+}

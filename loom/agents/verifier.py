@@ -25,11 +25,19 @@ class VerifierAgent:
         original_path: str,
         translated_path: str,
     ) -> VerificationResult:
-        """Run the legacy program in Docker and the translated program locally."""
+        """Run both programs with the same test input."""
 
-        original_result = self.docker_runner.run_python2(original_path)
+        test_input = "10 20 30\n"
 
-        translated_result = self._run_translated(translated_path)
+        original_result = self.docker_runner.run_python2(
+            original_path,
+            test_input,
+        )
+
+        translated_result = self._run_translated(
+            translated_path,
+            test_input,
+        )
 
         passed = (
             original_result.output == translated_result[0]
@@ -45,8 +53,12 @@ class VerifierAgent:
             translated_error=translated_result[1],
         )
 
-    def _run_translated(self, file_path: str) -> tuple[str, str, bool]:
-        """Run the translated Python 3 program."""
+    def _run_translated(
+        self,
+        file_path: str,
+        test_input: str,
+    ) -> tuple[str, str, bool]:
+        """Run the translated Python 3 program with test input."""
 
         import subprocess
         import sys
@@ -54,6 +66,7 @@ class VerifierAgent:
         try:
             process = subprocess.run(
                 [sys.executable, file_path],
+                input=test_input,
                 capture_output=True,
                 text=True,
                 timeout=30,

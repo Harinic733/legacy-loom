@@ -4,6 +4,8 @@ from rich.console import Console
 from loom.agents.reader import ReaderAgent
 from loom.agents.translator import TranslatorAgent
 from loom.agents.verifier import VerifierAgent
+from loom.reporting.report import MigrationReport
+
 
 app = typer.Typer(
     name="loom",
@@ -29,7 +31,7 @@ def analyze(file_path: str):
         result = reader.analyze(file_path)
 
         console.print("\n[bold]Legacy Loom Analysis[/bold]")
-        console.print("────────────────────────────")
+        console.print("----------------------------")
         console.print(f"File: {result.file_path}")
         console.print(f"Language: {result.language}")
         console.print(f"Lines: {result.total_lines}")
@@ -64,7 +66,7 @@ def migrate(file_path: str):
         analysis = reader.analyze(file_path)
 
         console.print("\n[bold]Legacy Loom Migration[/bold]")
-        console.print("────────────────────────────")
+        console.print("----------------------------")
         console.print(f"File: {analysis.file_path}")
         console.print(f"Detected language: {analysis.language}")
 
@@ -93,24 +95,28 @@ def migrate(file_path: str):
         )
 
         # 3. Verify original vs translated program
-        console.print("\n[bold]Running behavioral verification...[/bold]")
+        console.print(
+            "\n[bold]Running behavioral verification...[/bold]"
+        )
 
         result = verifier.verify(
             file_path,
             output_path,
         )
 
-        # 4. Display results
+        # 4. Display verification results
         console.print("\n[bold]Verification Results[/bold]")
-        console.print("────────────────────────────")
+        console.print("----------------------------")
 
         if result.passed:
             console.print(
                 "[bold green]✓ VERIFICATION PASSED[/bold green]"
             )
             console.print(
-                "Original and translated programs produced the same output."
+                "Original and translated programs produced "
+                "the same output."
             )
+
         else:
             console.print(
                 "[bold red]✗ VERIFICATION FAILED[/bold red]"
@@ -121,6 +127,27 @@ def migrate(file_path: str):
 
             console.print("[bold]Translated output:[/bold]")
             console.print(result.translated_output)
+
+        # 5. Generate migration report
+        report = MigrationReport(
+            source_file=file_path,
+            target_file=output_path,
+            language=analysis.language,
+            translated=True,
+            verified=result.passed,
+            original_output=result.original_output,
+            translated_output=result.translated_output,
+        )
+
+        # 6. Display migration report
+        console.print(report.display())
+
+        report_path = "reports/migration_report.json"
+        report.save_json(report_path)
+
+        console.print(
+            f"[green]Report saved: {report_path}[/green]"
+        )
 
     except FileNotFoundError as error:
         console.print(f"[red]Error:[/red] {error}")

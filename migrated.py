@@ -14,7 +14,8 @@ def greet(name):
 
 
 if __name__ == "__main__":
-    values = [10, 20, 30]
-    print(calculate_total(values))
+    values = input("Enter numbers: ")
+    numbers = [int(x) for x in values.split()]
+
+    print(calculate_total(numbers))
     greet("Legacy Loom")
-    
